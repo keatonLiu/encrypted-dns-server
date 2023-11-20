@@ -172,11 +172,13 @@ async fn handle_client_query(
     let original_packet_size = encrypted_packet.len();
     ensure!(original_packet_size >= DNS_HEADER_SIZE, "Short packet");
     debug_assert!(DNSCRYPT_QUERY_MIN_OVERHEAD > ANONYMIZED_DNSCRYPT_QUERY_MAGIC.len());
+
     if globals.anonymized_dns_enabled
         && original_packet_size >= ANONYMIZED_DNSCRYPT_QUERY_MAGIC.len() + DNS_HEADER_SIZE
         && encrypted_packet[..ANONYMIZED_DNSCRYPT_QUERY_MAGIC.len()]
             == ANONYMIZED_DNSCRYPT_QUERY_MAGIC
     {
+        println!("handle_anonymized_dns");
         return handle_anonymized_dns(
             globals,
             client_ctx,
@@ -235,6 +237,7 @@ async fn handle_client_query(
             Some(token) => ensure!(tokens.contains(&token), "Access token not found"),
         }
     }
+    println!("this");
     let response =
         resolver::get_cached_response_or_resolve(&globals, &client_ctx, &mut packet).await?;
     encrypt_and_respond_to_query(
@@ -573,6 +576,7 @@ fn set_limits(config: &Config) -> Result<(), Error> {
 }
 
 fn main() -> Result<(), Error> {
+    println!("生效了！");
     let matches = clap::command!()
         .arg(
             Arg::new("config")

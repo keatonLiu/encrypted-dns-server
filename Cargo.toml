@@ -98,4 +98,4 @@ priority = "optional"
 [profile.release]
 codegen-units = 1
 incremental = false
-panic = "abort"
+# panic = "abort"

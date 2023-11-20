@@ -45,7 +45,7 @@ pub async fn handle_anonymized_dns(
     #[cfg(feature = "metrics")]
     globals.varz.anonymized_queries.inc();
 
-    ensure!(IpExt::is_global(&ip), "Forbidden upstream address");
+    // ensure!(IpExt::is_global(&ip), "Forbidden upstream address");
     ensure!(
         !globals.anonymized_dns_blacklisted_ips.contains(&ip),
         "Blacklisted upstream IP"
@@ -112,6 +112,7 @@ pub async fn handle_anonymized_dns(
             break (response_len, true);
         }
     };
+    println!("response_len: {}", response_len);
     response.truncate(response_len);
     if is_certificate_response {
         let mut hasher = globals.hasher;
@@ -146,7 +147,7 @@ pub async fn handle_anonymized_dns(
 
     #[cfg(feature = "metrics")]
     globals.varz.anonymized_responses.inc();
-
+    println!("respond_to_query");
     respond_to_query(client_ctx, response).await
 }
 

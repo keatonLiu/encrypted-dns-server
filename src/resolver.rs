@@ -187,7 +187,11 @@ pub async fn get_cached_response_or_resolve(
     packet: &mut Vec<u8>,
 ) -> Result<Vec<u8>, Error> {
     let packet_qname = dns::qname(packet)?;
+    println!("qname: {:?}", packet_qname.to_ascii_lowercase());
+
     if let Some(my_ip) = &globals.my_ip {
+        println!("my_ip: {:?}, qname: {:?}", my_ip, packet_qname.to_ascii_lowercase());
+
         if &packet_qname.to_ascii_lowercase() == my_ip {
             let client_ip = match client_ctx {
                 ClientCtx::Udp(u) => u.client_addr,
