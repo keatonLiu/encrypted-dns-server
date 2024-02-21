@@ -3,7 +3,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV
 use std::sync::Arc;
 
 use byteorder::{BigEndian, ByteOrder};
-use ipext::IpExt;
+// use ipext::IpExt;
 use siphasher::sip128::Hasher128;
 use tokio::net::UdpSocket;
 
@@ -112,7 +112,9 @@ pub async fn handle_anonymized_dns(
             break (response_len, true);
         }
     };
+
     println!("response_len: {}", response_len);
+    
     response.truncate(response_len);
     if is_certificate_response {
         let mut hasher = globals.hasher;
@@ -147,7 +149,6 @@ pub async fn handle_anonymized_dns(
 
     #[cfg(feature = "metrics")]
     globals.varz.anonymized_responses.inc();
-    println!("respond_to_query");
     respond_to_query(client_ctx, response).await
 }
 

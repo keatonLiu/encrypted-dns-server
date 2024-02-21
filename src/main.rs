@@ -178,7 +178,6 @@ async fn handle_client_query(
         && encrypted_packet[..ANONYMIZED_DNSCRYPT_QUERY_MAGIC.len()]
             == ANONYMIZED_DNSCRYPT_QUERY_MAGIC
     {
-        println!("handle_anonymized_dns");
         return handle_anonymized_dns(
             globals,
             client_ctx,
@@ -237,7 +236,6 @@ async fn handle_client_query(
             Some(token) => ensure!(tokens.contains(&token), "Access token not found"),
         }
     }
-    println!("this");
     let response =
         resolver::get_cached_response_or_resolve(&globals, &client_ctx, &mut packet).await?;
     encrypt_and_respond_to_query(
@@ -339,12 +337,16 @@ async fn tcp_acceptor(globals: Arc<Globals>, tcp_listener: TcpListener) -> Resul
             if packet_len == 0x1603 {
                 return tls_proxy(globals, binlen, client_connection).await;
             }
+            println!("packet_len: {}, addr: {}", packet_len, client_connection.peer_addr().unwrap());
             ensure!(
                 (DNS_HEADER_SIZE..=DNSCRYPT_TCP_QUERY_MAX_SIZE).contains(&packet_len),
                 "Unexpected TCP query size"
             );
             let mut packet = vec![0u8; packet_len];
+            // count time
+            let time_start = std::time::Instant::now();
             client_connection.read_exact(&mut packet).await?;
+            println!("time cost reading packet: {}ms", time_start.elapsed().as_millis());
             let client_ctx = ClientCtx::Tcp(TcpClientCtx { client_connection });
             let _ = handle_client_query(globals, client_ctx, packet).await;
             Ok(())
@@ -576,7 +578,6 @@ fn set_limits(config: &Config) -> Result<(), Error> {
 }
 
 fn main() -> Result<(), Error> {
-    println!("生效了！");
     let matches = clap::command!()
         .arg(
             Arg::new("config")

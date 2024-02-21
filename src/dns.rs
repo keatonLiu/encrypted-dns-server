@@ -118,7 +118,7 @@ pub fn an_ns_ar_count_clear(packet: &mut [u8]) {
 }
 
 #[inline]
-pub fn tid(packet: &[u8]) -> u16 {
+pub fn tid(packet: &[u8]) -> u16 {                                      
     BigEndian::read_u16(&packet[0..])
 }
 

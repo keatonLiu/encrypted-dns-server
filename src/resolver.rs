@@ -13,6 +13,7 @@ use crate::dns::{self, *};
 use crate::errors::*;
 use crate::globals::*;
 use crate::ClientCtx;
+use std::borrow::Cow;
 
 pub async fn resolve_udp(
     globals: &Globals,
@@ -187,10 +188,21 @@ pub async fn get_cached_response_or_resolve(
     packet: &mut Vec<u8>,
 ) -> Result<Vec<u8>, Error> {
     let packet_qname = dns::qname(packet)?;
-    println!("qname: {:?}", packet_qname.to_ascii_lowercase());
+
+    if let Cow::Borrowed(string) = String::from_utf8_lossy(&packet_qname) {
+        // 打印字符串
+        println!("qname: {}", string);
+    } else {
+        println!("Conversion failed");
+    }
 
     if let Some(my_ip) = &globals.my_ip {
-        println!("my_ip: {:?}, qname: {:?}", my_ip, packet_qname.to_ascii_lowercase());
+        if let Cow::Borrowed(string) = String::from_utf8_lossy(my_ip) {
+            // 打印字符串
+            println!("my_ip: {}", string);
+        } else {
+            println!("Conversion failed");
+        }
 
         if &packet_qname.to_ascii_lowercase() == my_ip {
             let client_ip = match client_ctx {
